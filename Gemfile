@@ -4,9 +4,9 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem "vagrant", git: "https://github.com/mitchellh/vagrant.git", tag: 'v1.8.4'
+  gem "vagrant", git: "https://github.com/mitchellh/vagrant.git"
 end
 
 group :plugins do
-  gem "vagrant-syncer", path: "."
+  gemspec
 end
