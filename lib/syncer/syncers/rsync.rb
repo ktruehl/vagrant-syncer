@@ -21,6 +21,10 @@ module Vagrant
           @ssh_command = parse_ssh_command(machine.config.syncer.ssh_args)
           @exclude_args = parse_exclude_args(path_opts[:rsync__exclude])
 
+          @absolute_exclude_paths = @exclude_args.map do |exclude|
+            (@host_path + exclude[1] + '/').gsub('//', '/')[0...-1]
+          end
+
           ssh_username = machine.ssh_info[:username]
           ssh_host = machine.ssh_info[:host]
           @ssh_target = "#{ssh_username}@#{ssh_host}:#{@guest_path}"
@@ -47,6 +51,20 @@ module Vagrant
         end
 
         def sync(changed_paths=[], initial=false)
+          valid_changed_paths = []
+          changed_paths.each do |path|
+            valid = true
+            @absolute_exclude_paths.each do |absolute_exclude|
+              if path.start_with?(absolute_exclude + '/') || (path == absolute_exclude)
+                valid = false
+                break
+              end
+            end
+            valid_changed_paths.push(path) if valid
+          end
+          return if valid_changed_paths.empty?
+          changed_paths = valid_changed_paths
+
           rsync_command = [
             "rsync",
             @rsync_args,
