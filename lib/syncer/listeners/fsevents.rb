@@ -24,6 +24,11 @@ module Vagrant
             directories = Set.new
             change = changes.pop
             directories << change  unless change.nil?
+            loop do
+              change = changes.pop
+              directories << change  unless change.nil?
+              break if changes.empty? || (directories.size >= 200)
+            end
             @callback.call(directories.to_a)  unless directories.empty?
           end
         end

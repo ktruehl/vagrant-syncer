@@ -53,6 +53,8 @@ module Vagrant
         def sync(changed_paths=[], initial=false)
           valid_changed_paths = []
           changed_paths.each do |path|
+            next unless path.start_with?(@host_path)
+
             valid = true
             @absolute_exclude_paths.each do |absolute_exclude|
               if path.start_with?(absolute_exclude + '/') || (path == absolute_exclude)
